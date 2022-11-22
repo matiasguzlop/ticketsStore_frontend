@@ -2,8 +2,8 @@ import { Spin } from 'antd';
 import React, { useEffect } from 'react';
 import { useContext } from 'react';
 import MyContext from '../MyContext';
-import CartProduct from '../Components/CartProduct';
-import CartProductsContainer from '../Components/CartProductContainer';
+import CartProduct from '../Components/Cart/CartProduct';
+import CartProductsContainer from '../Components/Cart/CartProductContainer';
 
 export default function Cart() {
     const { context, getCartImperative } = useContext(MyContext);

@@ -1,11 +1,11 @@
 import { Button, Descriptions, InputNumber, Modal, Space, Spin } from 'antd';
 import { DeleteOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import React, { useState } from 'react';
-import getProduct from '../Services/getProduct';
-import updateProductFromCart from '../Services/updateProductFromCart';
+import getProduct from '../../Services/getProduct';
+import updateProductFromCart from '../../Services/updateProductFromCart';
 import { useContext } from 'react';
-import MyContext from '../MyContext';
-import deleteProductFromCart from '../Services/deleteProductFromCart';
+import MyContext from '../../MyContext';
+import deleteProductFromCart from '../../Services/deleteProductFromCart';
 import { useEffect } from 'react';
 
 function CartProduct({ productId, qty: initialQty }) {
