@@ -17,11 +17,13 @@ const BadgeContainer = styled.div`
 `;
 
 function Badge({ children, count }) {
-    if (count === 0) return;
     return (
         <>
             {children}
-            <BadgeContainer>{count}</BadgeContainer>
+            {
+                count !== 0 &&
+                <BadgeContainer>{count}</BadgeContainer>
+            }
         </>
     );
 }

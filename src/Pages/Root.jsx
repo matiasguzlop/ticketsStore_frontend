@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
-import { Outlet, Link, useLocation } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import '../App.css';
-import { Layout, Button, PageHeader } from 'antd';
-import { ShoppingCartOutlined } from '@ant-design/icons';
-import CheckoutButton from '../Components/CheckoutButton';
+import { Layout, PageHeader } from 'antd';
 import MyContext from '../MyContext';
 import getCart from '../Services/getCart';
 import { useEffect } from 'react';
-import Badge from '../Components/Badge';
+import GoToCartButton from '../Components/GoToCartButton';
 
 const { Content, Footer } = Layout;
 
@@ -15,8 +13,7 @@ const userId = "6366a2d1ee22db915130c24b";
 
 function Root() {
     const getCartImperative = () => {
-        const userId = "6366a2d1ee22db915130c24b";
-        getCart(userId).then(result => {
+        getCart(context.userId).then(result => {
             setContext(prev => ({
                 ...prev,
                 cart: result
@@ -26,7 +23,6 @@ function Root() {
 
     const [context, setContext] = useState(
         {
-            getCartImperative: getCartImperative,
             cart: [],
             cartId: "6366a318ee22db915130c255",
             userId: userId,
@@ -37,7 +33,7 @@ function Root() {
     const location = useLocation().pathname;
     return (
         <MyContext.Provider
-            value={context}
+            value={{ context, getCartImperative }}
         >
             <Layout style={{ minHeight: "100vh" }}>
                 <PageHeader
@@ -46,16 +42,7 @@ function Root() {
                     onBack={() => window.history.back()}
                     ghost={true}
                     extra={
-                        location === "/cart"
-                            ? <CheckoutButton></CheckoutButton>
-                            :
-                            <Link to="/cart" >
-                                <Badge count={context.cart.length}>
-                                    <Button type='primary' icon={<ShoppingCartOutlined />}>
-                                        Ver carro
-                                    </Button>
-                                </Badge>
-                            </Link>
+                        <GoToCartButton location={location} />
                     }
                 >
                 </PageHeader>

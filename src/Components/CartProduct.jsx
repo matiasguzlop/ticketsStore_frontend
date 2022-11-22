@@ -10,7 +10,7 @@ import { useEffect } from 'react';
 
 function CartProduct({ productId, qty: initialQty }) {
     const [shouldRender, setShouldRender] = useState(true);
-    const { cartId } = useContext(MyContext);
+    const { context, getCartImperative } = useContext(MyContext);
 
     const [productData, setProductData] = useState(null);
     const [isError, setIsError] = useState(false);
@@ -45,7 +45,7 @@ function CartProduct({ productId, qty: initialQty }) {
         });
     };
     const handleDeleteConfirmed = () => {
-        deleteProductFromCart(cartId, productId);
+        deleteProductFromCart(context.cartId, productId).then(getCartImperative);
         setShouldRender(false);
     };
 
@@ -58,7 +58,7 @@ function CartProduct({ productId, qty: initialQty }) {
         }
     };
     const handleUpdateQty = () => {
-        updateProductFromCart(cartId, productId, qty.value, setUpdateStatus);
+        updateProductFromCart(context.cartId, productId, qty.value, setUpdateStatus);
         if (updateStatus !== "error" && updateStatus !== "loading") {
             setQty({ value: qty.value, needFetch: false });
         }

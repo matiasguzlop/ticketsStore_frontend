@@ -4,7 +4,7 @@ import MyContext from '../../MyContext';
 const { Title } = Typography;
 
 function ProductCard({ productId, name, price, stock, setProductToCart }) {
-    const { cartId } = useContext(MyContext);
+    const { context, getCartImperative } = useContext(MyContext);
     const [qty, setQty] = useState(1);
     const localPrice = parseInt(price).toLocaleString("es-CL", { currency: "CLP" });
     return (
@@ -25,7 +25,9 @@ function ProductCard({ productId, name, price, stock, setProductToCart }) {
             <Divider></Divider>
             <Button
                 type='primary'
-                onClick={() => setProductToCart({ productId, cartId, qty, name })}
+                onClick={() => {
+                    setProductToCart({ productId, cartId: context.cartId, qty, name });
+                }}
             >Agregar al carro</Button>
         </Card >
     );

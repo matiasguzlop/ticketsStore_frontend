@@ -34,8 +34,7 @@ export default function StorePage() {
         if (productToCart === null) {
             setShowCartConfirmationModal(false);
         } else {
-            addToCart(productToCart, setAddStatus);
-            getCartImperative();
+            addToCart(productToCart, setAddStatus).then(getCartImperative);
             setShowCartConfirmationModal(true);
         }
     }, [productToCart]);
