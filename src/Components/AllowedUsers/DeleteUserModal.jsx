@@ -29,7 +29,7 @@ function DeleteUserModal({ setShow, show, onNewUser }) {
     return (
         <Modal
             open={show}
-            onCancel={() => setShowNewUserModal(false)}
+            onCancel={() => setShow(false)}
             title="Nuevo usuario"
             footer={
                 <>
