@@ -27,6 +27,9 @@ function AdminPage() {
             >
             </PageHeader>
             <Content>
+                <Button
+
+                >Descargar planilla</Button>
                 <Orders />
             </Content>
             <Footer>

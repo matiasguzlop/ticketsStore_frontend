@@ -6,6 +6,7 @@ import MyContext from '../MyContext';
 import getCart from '../Services/getCart';
 import { useEffect } from 'react';
 import GoToCartButton from '../Components/GoToCartButton';
+import getProduct from '../Services/getProduct';
 
 const { Content, Footer } = Layout;
 
@@ -21,15 +22,33 @@ function Root() {
         });
     };
 
+
     const [context, setContext] = useState(
         {
             cart: [],
             cartId: "6366a318ee22db915130c255",
             userId: userId,
-            userAttributes: "admin"
+            userAttributes: "admin",
+            grandTotal: 0,
         });
 
+    useEffect(() => {
+        //calculate grand total when cart is changed
+        if (context.cart.length !== 0) {
+            const productsDataPromises = context.cart.map(item => getProduct(item.productId));
+            Promise.all(productsDataPromises).then(values => {
+                const grandTotal = values.reduce((prev, curr, index) => prev + parseInt(curr.price) * context.cart[index].qty, 0);
+                setContext(prevState => ({
+                    ...prevState,
+                    grandTotal,
+                }));
+            });
+        }
+
+    }, [context.cart]);
+
     useEffect(getCartImperative, []);
+
     const location = useLocation().pathname;
     return (
         <MyContext.Provider

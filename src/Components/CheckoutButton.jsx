@@ -1,31 +1,87 @@
 import React from 'react';
-import { Button } from 'antd';
+import { Button, Modal } from 'antd';
 import { ShoppingOutlined } from '@ant-design/icons';
 import { useContext } from 'react';
 import MyContext from '../MyContext';
 import { useState } from 'react';
-import { useEffect } from 'react';
 import placeOrder from '../Services/placeOrder';
+import styled from 'styled-components';
+import { CheckCircleOutlined } from '@ant-design/icons';
+import emptyCart from '../Services/emptyCart';
+
+const Container = styled.div`
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 4em;
+    align-content: center;
+    justify-content: center;
+`;
+
+const GrandTotal = styled.h1`
+    font-size: 2rem;
+    margin: 0;
+`;
 
 function CheckoutButton() {
-    const { cart, userId } = useContext(MyContext);
-    const [orderStatus, setOrderStatus] = useState(null);
-    const handleClick = async () => {
-        await placeOrder(cart, userId, setOrderStatus);
+    const { context, getCartImperative } = useContext(MyContext);
+
+    const [showModal, setShowModal] = useState(false);
+
+    const handleClick = () => {
+        setShowModal(true);
     };
-    useEffect(() => {
-        if (orderStatus === "sucess")
-            cart = [];
-    }, [orderStatus]);
+
+    const handleOk = () => {
+        //place order!
+        placeOrder(context.cart, context.userId)
+            .then(result => {
+                return emptyCart(context.cartId);
+            })
+            .then(getCartImperative);
+        setShowModal(false);
+    };
+
+    const handleCancel = () => {
+        setShowModal(false);
+    };
+
+    const grandTotal = context.grandTotal.toLocaleString("es-CL", { currency: "CLP" });
     return (
-        <Button
-            onClick={handleClick}
-            size='large'
-            icon={<ShoppingOutlined />}
-            type="primary"
-        >
-            Confirmar compra
-        </Button>
+        <>
+            <Container>
+                <GrandTotal>Total: ${grandTotal}</GrandTotal>
+                <Button
+                    disabled={context.grandTotal === 0}
+                    onClick={handleClick}
+                    size='large'
+                    icon={<ShoppingOutlined />}
+                    type="primary"
+                >
+                    Confirmar compra
+                </Button>
+            </Container>
+            <Modal
+                title="Confirma tu orden"
+                onOk={handleOk}
+                onCancel={handleCancel}
+                open={showModal}
+                footer={
+                    <>
+                        <Button
+                            onClick={handleCancel}
+                        >Cancelar</Button>
+                        <Button
+                            icon={<CheckCircleOutlined />}
+                            onClick={handleOk}
+                            type='primary'
+                        >
+                            Confirmar
+                        </Button>
+                    </>
+                }
+            >
+            </Modal>
+        </>
     );
 }
 

@@ -10,7 +10,7 @@ import { useEffect } from 'react';
 
 function CartProduct({ productId, qty: initialQty }) {
     const [shouldRender, setShouldRender] = useState(true);
-    const { context, getCartImperative } = useContext(MyContext);
+    const { context, getCartImperative, } = useContext(MyContext);
 
     const [productData, setProductData] = useState(null);
     const [isError, setIsError] = useState(false);
@@ -58,14 +58,16 @@ function CartProduct({ productId, qty: initialQty }) {
         }
     };
     const handleUpdateQty = () => {
-        updateProductFromCart(context.cartId, productId, qty.value, setUpdateStatus);
+        updateProductFromCart(context.cartId, productId, qty.value, setUpdateStatus).then(getCartImperative);;
         if (updateStatus !== "error" && updateStatus !== "loading") {
             setQty({ value: qty.value, needFetch: false });
         }
     };
 
-    const unitPriceFormatted = "$" + parseInt(productData.price).toLocaleString("es-CL", { currency: "CLP" });
-    const totalPriceFormatted = "$" + (parseInt(productData.price) * parseInt(qty.value)).toLocaleString("es-CL", { currency: "CLP" });
+    const unitPriceFormatted = "$" + parseInt(productData.price)
+        .toLocaleString("es-CL", { currency: "CLP" });
+    const totalPriceFormatted = "$" + (parseInt(productData.price) * parseInt(qty.value))
+        .toLocaleString("es-CL", { currency: "CLP" });
     return (
         <>
             <Descriptions
