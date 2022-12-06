@@ -44,13 +44,15 @@ function SingleOrder({ order }) {
                 }
             >
                 <div>
-                    {
-                        order.products.length === 0
-                            ? "No hay productos en esta orden."
-                            : order.products.map(prod =>
-                                <ProductInOrderDetails key={prod._id} qty={prod.qty} id={prod.productId} />
-                            )
-                    }
+                    <ul>
+                        {
+                            order.products.length === 0
+                                ? "No hay productos en esta orden."
+                                : order.products.map(prod =>
+                                    <ProductInOrderDetails key={prod._id} qty={prod.qty} id={prod.productId} />
+                                )
+                        }
+                    </ul>
                     <OrderTotal>{order.total}</OrderTotal>
                 </div>
             </Card>

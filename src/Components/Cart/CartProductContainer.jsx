@@ -2,9 +2,10 @@ import React from 'react';
 import styled from 'styled-components';
 
 const Container = styled.div`
-    padding: 1rem;
-    border-bottom: 1px solid;
-    margin: 1rem 2rem;
+    margin-top: 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
 `;
 
 function CartProductsContainer({ children }) {

@@ -40,6 +40,7 @@ function UsersList() {
     return (
         <>
             <Button
+                type='link'
                 onClick={handleNewUserClick}
             >Agregar usuario</Button>
             <Container>

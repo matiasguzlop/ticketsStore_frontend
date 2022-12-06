@@ -4,8 +4,29 @@ import getProduct from '../../Services/getProduct';
 
 const ProductName = styled.span`
     /* font-weight: bold; */
+    margin-left: 0.5rem;
+    display: inline-block;
+    width: 120px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    &:hover{
+        min-width: max-content;
+    }
+`;
+
+const ProductQty = styled.span`
+    width: 80px;
+`;
+
+const ProductTotal = styled.span``;
+
+const Container = styled.li`
+    width: 100%;
+    display: flex;
+    flex-wrap: nowrap;
     &::before{
-        content: "- ";
+        content: "-";
     }
 `;
 
@@ -24,10 +45,11 @@ function ProductInOrderDetails({ qty, id }) {
     if (productData === null) return "Cargando...";
     const productTotal = (parseInt(qty) * parseInt(productData.price)).toLocaleString("es-CL", { currency: "CLP" });
     return (
-        <>
+        <Container>
             <ProductName>{productData.name}</ProductName>
-            {`\t x ${qty}\t\t$${productTotal}`}
-        </>
+            <ProductQty>{` x ${qty} un.`}</ProductQty>
+            <ProductTotal>{`$${productTotal}`}</ProductTotal>
+        </Container>
     );
 }
 

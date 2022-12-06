@@ -7,6 +7,16 @@ import { useContext } from 'react';
 import MyContext from '../../MyContext';
 import deleteProductFromCart from '../../Services/deleteProductFromCart';
 import { useEffect } from 'react';
+import styled from 'styled-components';
+
+const StyledDescriptions = styled(Descriptions)`
+    margin-bottom: 2rem;
+    width: 51%;
+    &:not(:last-child){
+        border-bottom: 1px solid var(--border-light);
+        padding-bottom: 2rem;
+    }
+`;
 
 function CartProduct({ productId, qty: initialQty }) {
     const [shouldRender, setShouldRender] = useState(true);
@@ -70,7 +80,8 @@ function CartProduct({ productId, qty: initialQty }) {
         .toLocaleString("es-CL", { currency: "CLP" });
     return (
         <>
-            <Descriptions
+            <StyledDescriptions
+                size='small'
                 title={productData.name}
                 bordered={true}
                 extra={
@@ -103,7 +114,7 @@ function CartProduct({ productId, qty: initialQty }) {
                 >
                     {totalPriceFormatted}
                 </Descriptions.Item>
-            </Descriptions>
+            </StyledDescriptions>
         </>
     );
 

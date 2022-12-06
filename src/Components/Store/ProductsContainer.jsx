@@ -5,7 +5,7 @@ const Container = styled.div`
     display: flex;
     flex-wrap: wrap;
     gap: 1em;
-    padding: 2em 1em;
+    justify-content: center;
 `;
 
 function ProductsContainer({ children }) {

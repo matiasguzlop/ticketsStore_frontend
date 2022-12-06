@@ -17,7 +17,10 @@ function GoToCartButton({ location }) {
             :
             <Link to="/cart" >
                 <Badge count={context.cart.length}>
-                    <Button type='primary' icon={<ShoppingCartOutlined />}>
+                    <Button
+                        size='large'
+                        type='primary'
+                        icon={<ShoppingCartOutlined />}>
                         Ver carro
                     </Button>
                 </Badge>

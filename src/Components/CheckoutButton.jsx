@@ -12,18 +12,29 @@ import emptyCart from '../Services/emptyCart';
 const Container = styled.div`
     display: flex;
     flex-wrap: nowrap;
-    gap: 4em;
+    gap: 3em;
     align-content: center;
     justify-content: center;
 `;
 
-const GrandTotal = styled.h1`
-    font-size: 2rem;
-    margin: 0;
+const GrandTotal = styled.div`
+    font-size: 1rem;
+    padding: 0.4em 2rem;
+    font-weight: bold;
+    /* border: 3px solid var(--border-highlight); */
+    color: var(--color-highlight);
+    width: max-content;
+    background-color: var(--background-highlight);
+    border-radius: 20px;
+    label{
+        text-transform: uppercase;
+        font-weight: lighter;
+        font-size: 0.8em
+    }
 `;
 
 function CheckoutButton() {
-    const { context, getCartImperative } = useContext(MyContext);
+    const { context, getCartImperative, resetGrandTotal } = useContext(MyContext);
 
     const [showModal, setShowModal] = useState(false);
 
@@ -37,7 +48,8 @@ function CheckoutButton() {
             .then(result => {
                 return emptyCart(context.cartId);
             })
-            .then(getCartImperative);
+            .then(getCartImperative)
+            .then(resetGrandTotal);
         setShowModal(false);
     };
 
@@ -49,7 +61,7 @@ function CheckoutButton() {
     return (
         <>
             <Container>
-                <GrandTotal>Total: ${grandTotal}</GrandTotal>
+                <GrandTotal><label>Total:</label> ${grandTotal}</GrandTotal>
                 <Button
                     disabled={context.grandTotal === 0}
                     onClick={handleClick}
@@ -80,6 +92,7 @@ function CheckoutButton() {
                     </>
                 }
             >
+                {`Enviaremos una confirmación de tu pedido a ${context.userEmail}.`}
             </Modal>
         </>
     );

@@ -1,14 +1,12 @@
-import { Descriptions, Modal } from 'antd';
+import { Card, Descriptions, Modal } from 'antd';
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Button } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
 import deleteAllowedUser from '../../Services/deleteAllowedUser';
 
-const Container = styled.div`
-    border: 1px solid #AAAA;
-    margin: 1rem;
-    padding: 1rem;
+const Container = styled.article`
+    margin-top: 1rem;
 `;
 
 function SingleUser({ user }) {
@@ -34,8 +32,8 @@ function SingleUser({ user }) {
     if (shouldRender === false) return;
 
     const UserDescription = ({ withDelete }) =>
-        <Descriptions
-            layout='vertical'
+        <Card
+            title={user.email}
             extra={
                 withDelete &&
                 <Button
@@ -47,28 +45,25 @@ function SingleUser({ user }) {
                 </Button>
             }
         >
-            <Descriptions.Item label="Correo electrónico">
-                {user.email}
-            </Descriptions.Item>
-            <Descriptions.Item label="Teléfono">
-                {user.phone}
-            </Descriptions.Item>
-        </Descriptions>;
+            <Descriptions>
+                <Descriptions.Item label="Teléfono">
+                    {user.phone}
+                </Descriptions.Item>
+            </Descriptions>
+        </Card>;
 
     return (
-        <>
-            <Container>
-                <UserDescription withDelete={true} />
-            </Container>
+        <Container>
+            <UserDescription withDelete={true} />
             <Modal
-                title="¿Seguro que quieres eliminar este usuario?"
+                title='¿Seguro que quieres eliminar el usuario?'
                 onCancel={handleDeleteCancelled}
                 open={showDeleteConfirmationModal}
                 onOk={handleDeleteConfirmed}
             >
                 <UserDescription />
             </Modal>
-        </>
+        </Container>
     );
 }
 

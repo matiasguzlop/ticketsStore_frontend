@@ -33,6 +33,7 @@ function ProductList() {
         <>
             <Button
                 onClick={handleNewProductClick}
+                type='link'
             >Nuevo producto...</Button>
             {products.length === 0
                 ? "No existen productos en la tienda."

@@ -13,6 +13,7 @@ import LoginPage from './Pages/LoginPage';
 import AdminPage from './Pages/AdminPage';
 import WhiteListPage from './Pages/WhiteListPage';
 import ProductListPage from './Pages/ProductListPage';
+import NewAccountPage from './Pages/NewAccountPage';
 
 const router = createBrowserRouter([
   {
@@ -32,7 +33,12 @@ const router = createBrowserRouter([
   }, {
     path: "/login",
     element: <LoginPage />
-  }, {
+  },
+  {
+    path: "/newAccount",
+    element: <NewAccountPage />
+  },
+  {
     path: "/admin",
     element: <AdminPage />,
   }, {
@@ -47,6 +53,9 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <RouterProvider router={router}></RouterProvider>
+    <>
+      <RouterProvider router={router}>
+      </RouterProvider>
+    </>
   </React.StrictMode>
 );

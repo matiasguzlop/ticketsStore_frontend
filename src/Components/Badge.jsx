@@ -11,20 +11,26 @@ const BadgeContainer = styled.div`
     font-size: 16px;
     text-align: center;
     z-index: 1;
+    right: calc(120px - 24px / 2);
+    bottom: calc(-24px / 3);
+`;
+
+const Container = styled.div`
     position: relative;
-    left: -10px;
-    bottom: 15px;
+    display: flex;
+    justify-content: right;
+    width: 100%;
 `;
 
 function Badge({ children, count }) {
     return (
-        <>
+        <Container>
             {children}
             {
                 count !== 0 &&
                 <BadgeContainer>{count}</BadgeContainer>
             }
-        </>
+        </Container>
     );
 }
 

@@ -1,4 +1,4 @@
-import { Descriptions, Modal } from 'antd';
+import { Card, Descriptions, Modal } from 'antd';
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Button } from 'antd';
@@ -7,9 +7,7 @@ import deleteProduct from '../../Services/deleteProduct';
 import EditModal from './EditModal';
 
 const Container = styled.div`
-    border: 1px solid #AAAA;
-    margin: 1rem;
-    padding: 1rem;
+    margin-top: 1rem;
 `;
 
 function SingleProduct({ product }) {
@@ -38,7 +36,8 @@ function SingleProduct({ product }) {
 
     const ProductDescription = ({ withControls }) => {
         return (
-            <Descriptions
+            <Card
+                title={data.name}
                 extra={
                     withControls &&
                     <>
@@ -56,11 +55,12 @@ function SingleProduct({ product }) {
                     </>
                 }
             >
-                <Descriptions.Item label="Nombre">{data.name}</Descriptions.Item>
-                <Descriptions.Item label="Precio">{priceFormatted}</Descriptions.Item>
-                <Descriptions.Item label="Stock">{data.stock}</Descriptions.Item>
-                <Descriptions.Item label="Habilitado">{data.available ? "Si" : "No"}</Descriptions.Item>
-            </Descriptions>
+                <Descriptions>
+                    <Descriptions.Item label="Precio">{priceFormatted}</Descriptions.Item>
+                    <Descriptions.Item label="Stock">{data.stock}</Descriptions.Item>
+                    <Descriptions.Item label="Habilitado">{data.available ? "Si" : "No"}</Descriptions.Item>
+                </Descriptions>
+            </Card>
         );
     };
     if (shouldRender === false) return;

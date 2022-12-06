@@ -1,36 +1,49 @@
 import React, { useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import '../App.css';
-import { Layout, PageHeader } from 'antd';
+import { Layout } from 'antd';
+import PageHeader from '../Components/PageHeader';
 import MyContext from '../MyContext';
 import getCart from '../Services/getCart';
 import { useEffect } from 'react';
 import GoToCartButton from '../Components/GoToCartButton';
 import getProduct from '../Services/getProduct';
+import IsLoggedChecker from '../Components/IsLoggedChecker';
+import LogoutButton from '../Components/LogoutButton';
+import UserEmail from '../Components/UserEmail';
 
 const { Content, Footer } = Layout;
 
-const userId = "6366a2d1ee22db915130c24b";
-
 function Root() {
     const getCartImperative = () => {
-        getCart(context.userId).then(result => {
-            setContext(prev => ({
-                ...prev,
-                cart: result
-            }));
-        });
+        if (context.userId) {
+            getCart(context.userId).then(result => {
+                setContext(prev => ({
+                    ...prev,
+                    cart: result
+                }));
+            });
+        }
+    };
+
+    const resetGrandTotal = () => {
+        setContext(prev => ({
+            ...prev,
+            grandTotal: 0
+        }));
     };
 
 
     const [context, setContext] = useState(
         {
             cart: [],
-            cartId: "6366a318ee22db915130c255",
-            userId: userId,
-            userAttributes: "admin",
+            cartId: undefined,
+            userId: undefined,
+            userAttributes: undefined,
+            userEmail: undefined,
             grandTotal: 0,
         });
+
 
     useEffect(() => {
         //calculate grand total when cart is changed
@@ -48,20 +61,29 @@ function Root() {
     }, [context.cart]);
 
     useEffect(getCartImperative, []);
-
     const location = useLocation().pathname;
+
+    const title = location === "/cart" ? "Carro de compras" : "Tickets Store";
     return (
         <MyContext.Provider
-            value={{ context, getCartImperative }}
+            value={{ context, getCartImperative, resetGrandTotal, setContext }}
         >
+            <IsLoggedChecker requiredAttributes="user" />
             <Layout style={{ minHeight: "100vh" }}>
                 <PageHeader
-                    title="Tickets Store"
+                    title={title}
                     subTitle="ANFDGAC"
                     onBack={() => window.history.back()}
-                    ghost={true}
-                    extra={
-                        <GoToCartButton location={location} />
+                    topRight={
+                        <>
+                            <UserEmail />
+                            <LogoutButton />
+                        </>
+                    }
+                    right={
+                        <>
+                            <GoToCartButton location={location} />
+                        </>
                     }
                 >
                 </PageHeader>

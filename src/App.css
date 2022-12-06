@@ -1,1 +1,8 @@
 @import '~/antd/dist/antd.css';
+
+:root {
+    --border-light: #DDD;
+    --background-highlight: #1890FF;
+    --border-highlight: #1890FF;
+    --color-highlight: white;
+}
