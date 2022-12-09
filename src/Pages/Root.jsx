@@ -33,7 +33,6 @@ function Root() {
         }));
     };
 
-
     const [context, setContext] = useState(
         {
             cart: [],
@@ -44,6 +43,7 @@ function Root() {
             grandTotal: 0,
         });
 
+    useEffect(getCartImperative, [context.userId]);
 
     useEffect(() => {
         //calculate grand total when cart is changed
@@ -57,10 +57,8 @@ function Root() {
                 }));
             });
         }
-
     }, [context.cart]);
 
-    useEffect(getCartImperative, []);
     const location = useLocation().pathname;
 
     const title = location === "/cart" ? "Carro de compras" : "Tickets Store";
