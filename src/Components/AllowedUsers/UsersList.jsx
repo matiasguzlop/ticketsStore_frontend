@@ -5,33 +5,34 @@ import { useState } from 'react';
 import styled from 'styled-components';
 import getWhiteList from '../../Services/getWhiteList';
 import SingleUser from './SingleUser';
-import DeleteUserModal from './DeleteUserModal';
+import NewUserModal from './NewUserModal';
+import FetchErrorMessage from '../../Components/FetchErrorMessage';
+import FetchLoadingMessage from '../../Components/FetchLoadingMessage';
 
 const Container = styled.div`
-    
     
 `;
 
 function UsersList() {
     const [showNewUserModal, setShowNewUserModal] = useState(false);
 
-    //state for allowed users list
-    const [isError, setIsError] = useState(false);
-    const [users, setUsers] = useState(null);
+    const [users, setUsers] = useState([]);
+    const [usersFetchStatus, setUsersFetchStatus] = useState({ isError: false, isLoading: false });
 
     const getWhiteListImperative = () => {
         //get allowed users list
+        setUsersFetchStatus({ isError: false, isLoading: true });
         getWhiteList().then(result => {
-            setIsError(false);
+            setUsersFetchStatus({ isError: false, isLoading: false });
             setUsers(result);
-        }).catch(error => setIsError(true));
+        }).catch(() => setUsersFetchStatus({ isError: true, isLoading: false }));
     };
 
     //gets allowed users list for first time
     useEffect(getWhiteListImperative, []);
 
-    if (isError) return "Error";
-    if (users === null) return "Cargando...";
+    if (setUsersFetchStatus.isError) return <FetchErrorMessage resourceName='usuarios' />;
+    if (setUsersFetchStatus.isLoading) return <FetchLoadingMessage resourceName='usuarios' />;
 
     const handleNewUserClick = () => {
         setShowNewUserModal(true);
@@ -50,7 +51,7 @@ function UsersList() {
                         <SingleUser key={user._id} user={user}></SingleUser>
                     )}
             </Container>
-            <DeleteUserModal
+            <NewUserModal
                 show={showNewUserModal}
                 setShow={setShowNewUserModal}
                 onNewUser={getWhiteListImperative}

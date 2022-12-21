@@ -21,7 +21,7 @@ export default function ProductListPage() {
             >
             </PageHeader>
             <Content>
-                <ProductList></ProductList>
+                <ProductList />
             </Content>
             <Footer>
 

@@ -6,30 +6,46 @@ import OrderStatus from './OrderStatus';
 import OrderTotal from './OrderTotal';
 import { DeleteOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
-import DeleteOrderModal from './DeleteOrderModal';
+import deleteOrder from '../../Services/deleteOrder';
+import DeleteConfirmationModal from '../DeleteConfirmationModal';
+import FetchErrorMessage from '../../Components/FetchErrorMessage';
+import FetchLoadingMessage from '../../Components/FetchLoadingMessage';
 
 function SingleOrder({ order }) {
     const [shouldRender, setShouldRender] = useState(true);
-    const [userData, setUserData] = useState(null);
-    const [isError, setIsError] = useState(false);
+
+    const [userData, setUserData] = useState([]);
+    const [fetchStatus, setFetchStatus] = useState({ isError: false, isLoading: false });
 
     const [showDeleteConfirmationModal, setShowDeleteConfirmationModal] = useState(false);
+    const [deleteFetchStatus, setDeleteFetchStatus] = useState({ isError: false, isLoading: false });
 
     useEffect(() => {
+        setFetchStatus({ isError: false, isLoading: true });
         getUserById(order.userId).then(result => {
-            setIsError(false);
+            setFetchStatus({ isError: false, isLoading: false });
             setUserData(result);
-        }).catch(e => setIsError(true));
+        }).catch(() => setFetchStatus({ isError: true, isLoading: false }));
     }, []);
 
-    if (userData === null) return "Cargando...";
-    if (isError) return "Error al cargar orden.";
+    const handleDeleteConfirmed = () => {
+        setDeleteFetchStatus({ isError: false, isLoading: true });
+        deleteOrder(order._id)
+            .then(() => {
+                setShouldRender(false);
+                setDeleteFetchStatus({ isError: false, isLoading: false });
+            })
+            .catch(() => setDeleteFetchStatus({ isError: true, isLoading: false }));
+    };
+
+    if (fetchStatus.isLoading) return <FetchLoadingMessage resourceName='orden' />;
+    if (fetchStatus.isError) return <FetchErrorMessage resourceName='orden' />;
     if (shouldRender === false) return;
     return (
         <>
             <Card
                 style={{ margin: "1rem" }}
-                title={userData.email}
+                title={fetchStatus.isLoading ? <Spin /> : userData.email}
                 extra={
                     <>
                         <Button
@@ -56,12 +72,13 @@ function SingleOrder({ order }) {
                     <OrderTotal>{order.total}</OrderTotal>
                 </div>
             </Card>
-            <DeleteOrderModal
-                id={order._id}
+            <DeleteConfirmationModal
                 show={showDeleteConfirmationModal}
                 setShow={setShowDeleteConfirmationModal}
-                onDelete={() => setShouldRender(false)}
-            />
+                onConfirm={handleDeleteConfirmed}
+                status={deleteFetchStatus}
+                resourceName='orden'
+            ></DeleteConfirmationModal>
         </>
     );
 }

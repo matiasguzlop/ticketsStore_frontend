@@ -1,27 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import getOrders from '../../Services/getOrders';
+import FetchErrorMessage from '../FetchErrorMessage';
+import FetchLoadingMessage from '../FetchLoadingMessage';
 import SingleOrder from './SingleOrder';
 
 const Container = styled.section`
     display: flex;
+    flex-wrap: wrap;
     margin-top: 2rem;
     justify-content: center;
 `;
 
-export default function Orders() {
-    const [data, setData] = useState(null);
-    const [isError, setIsError] = useState(false);
+export default function OrderList() {
+    const [data, setData] = useState([]);
+    const [fetchStatus, setFetchStatus] = useState({ isError: false, isLoading: false });
 
     useEffect(() => {
+        setFetchStatus({ isError: false, isLoading: true });
         getOrders().then(result => {
-            setIsError(false);
+            setFetchStatus({ isError: false, isLoading: false });
             setData(result);
-        }).catch(e => setIsError(true));
+        }).catch(() => setFetchStatus({ isError: true, isLoading: false }));
     }, []);
 
-    if (isError) return "Error al cargar órdenes.";
-    if (data === null) return "Cargando...";
+    if (fetchStatus.isError) return <FetchErrorMessage resourceName='órdenes' />;
+    if (fetchStatus.isLoading) return <FetchLoadingMessage resourceName='órdenes' />;
     return (
         <Container>
             {

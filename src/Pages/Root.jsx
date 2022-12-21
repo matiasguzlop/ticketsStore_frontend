@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import '../App.css';
 import { Layout } from 'antd';
 import PageHeader from '../Components/PageHeader';
 import MyContext from '../MyContext';
 import getCart from '../Services/getCart';
-import { useEffect } from 'react';
 import GoToCartButton from '../Components/GoToCartButton';
 import getProduct from '../Services/getProduct';
 import IsLoggedChecker from '../Components/IsLoggedChecker';
@@ -60,7 +59,6 @@ function Root() {
     }, [context.cart]);
 
     const location = useLocation().pathname;
-
     const title = location === "/cart" ? "Carro de compras" : "Tickets Store";
     return (
         <MyContext.Provider

@@ -1,13 +1,13 @@
-import { Button, Descriptions, InputNumber, Modal, Space, Spin } from 'antd';
-import { DeleteOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
-import React, { useState } from 'react';
-import getProduct from '../../Services/getProduct';
-import updateProductFromCart from '../../Services/updateProductFromCart';
-import { useContext } from 'react';
-import MyContext from '../../MyContext';
-import deleteProductFromCart from '../../Services/deleteProductFromCart';
-import { useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import styled from 'styled-components';
+import { Descriptions, Space } from 'antd';
+import getProduct from '../../Services/getProduct';
+import MyContext from '../../MyContext';
+import FetchErrorMessage from '../../Components/FetchErrorMessage';
+import FetchLoadingMessage from '../../Components/FetchLoadingMessage';
+import FormattedPrice from '../FormattedPrice';
+import ProductQty from './ProductQty';
+import DeleteProductButton from './DeleteProductButton';
 
 const StyledDescriptions = styled(Descriptions)`
     margin-bottom: 2rem;
@@ -19,65 +19,33 @@ const StyledDescriptions = styled(Descriptions)`
 `;
 
 function CartProduct({ productId, qty: initialQty }) {
+    const { context } = useContext(MyContext);
+
     const [shouldRender, setShouldRender] = useState(true);
-    const { context, getCartImperative, } = useContext(MyContext);
 
     const [productData, setProductData] = useState(null);
-    const [isError, setIsError] = useState(false);
+    const [productFetchStatus, setProductFetchStatus] = useState({ isError: false, isLoading: true });
 
     const [qty, setQty] = useState({ value: initialQty, needFetch: false });
-    const [updateStatus, setUpdateStatus] = useState({ isLoading: false, isError: false, data: null });
-
 
     const getProductDataImperative = () => {
-        getProduct(productId).then(result => {
-            setIsError(false);
-            setProductData(result);
-        }).catch(error => setIsError(true));
+        setProductFetchStatus({ isError: false, isLoading: true });
+        getProduct(productId)
+            .then(result => {
+                setProductFetchStatus({ isError: false, isLoading: false });
+                setProductData(result);
+            }).catch(() => setProductFetchStatus({ isError: true, isLoading: false }));
     };
 
-    useEffect(getProductDataImperative, []);
+    useEffect(() => getProductDataImperative, []);
 
-    if (isError) return "Error";
-    if (productData === null) return "Cargando...";
     if (shouldRender === false) return;
+    if (productFetchStatus.isError) return <FetchErrorMessage resourceName='producto' />;
+    if (productFetchStatus.isLoading) return <FetchLoadingMessage resourceName='producto' />;
 
-    //delete handlers
-    const handleDelete = () => {
-        Modal.confirm({
-            title: "¿Eliminar producto del carro?",
-            icon: <ExclamationCircleOutlined />,
-            content: productData.name,
-            okText: "Eliminar",
-            okButtonProps: { danger: true },
-            cancelText: "Cancelar",
-            onOk: handleDeleteConfirmed
-        });
-    };
-    const handleDeleteConfirmed = () => {
-        deleteProductFromCart(context.cartId, productId).then(getCartImperative);
-        setShouldRender(false);
-    };
+    const unitPriceFormatted = <FormattedPrice price={productData.price} />;
+    const totalPriceFormatted = <FormattedPrice price={parseInt(productData.price) * parseInt(qty.value)} />;
 
-    //update handlers
-    const handlePreUpdateQty = (newValue) => {
-        if (newValue !== qty.value) {
-            setQty({ value: newValue, needFetch: true });
-        } else {
-            setQty({ value: newValue, needFetch: false });
-        }
-    };
-    const handleUpdateQty = () => {
-        updateProductFromCart(context.cartId, productId, qty.value, setUpdateStatus).then(getCartImperative);;
-        if (updateStatus !== "error" && updateStatus !== "loading") {
-            setQty({ value: qty.value, needFetch: false });
-        }
-    };
-
-    const unitPriceFormatted = "$" + parseInt(productData.price)
-        .toLocaleString("es-CL", { currency: "CLP" });
-    const totalPriceFormatted = "$" + (parseInt(productData.price) * parseInt(qty.value))
-        .toLocaleString("es-CL", { currency: "CLP" });
     return (
         <>
             <StyledDescriptions
@@ -86,13 +54,12 @@ function CartProduct({ productId, qty: initialQty }) {
                 bordered={true}
                 extra={
                     <Space>
-                        {(updateStatus.isLoading || updateStatus.isError) && <Spin key="spin"></Spin>}
-                        <Button
-                            key="delete"
-                            danger={true}
-                            type="primary"
-                            onClick={handleDelete}
-                        ><DeleteOutlined /></Button>
+                        <DeleteProductButton
+                            productData={productData}
+                            cartId={context.cartId}
+                            productId={productId}
+                            setShouldRender={setShouldRender}
+                        />
                     </Space>
                 }
             >
@@ -101,13 +68,13 @@ function CartProduct({ productId, qty: initialQty }) {
                 >
                     {unitPriceFormatted}
                 </Descriptions.Item>
-                <Descriptions.Item
-                    label="Cantidad"
-                >
-                    <Space direction='vertical'>
-                        <InputNumber min={1} value={qty.value} onChange={handlePreUpdateQty} />
-                        {qty.needFetch && <Button onClick={handleUpdateQty} size='small'>Actualizar</Button>}
-                    </Space>
+                <Descriptions.Item label='Cantidad'>
+                    <ProductQty
+                        qty={qty}
+                        setQty={setQty}
+                        cartId={context.cartId}
+                        productId={productId}
+                    ></ProductQty>
                 </Descriptions.Item>
                 <Descriptions.Item
                     label="Precio total"
@@ -117,7 +84,6 @@ function CartProduct({ productId, qty: initialQty }) {
             </StyledDescriptions>
         </>
     );
-
 }
 
 export default CartProduct;

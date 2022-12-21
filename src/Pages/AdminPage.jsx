@@ -1,9 +1,8 @@
 import React from 'react';
 import { Layout, Button, Space } from 'antd';
-import { Link, useNavigate } from 'react-router-dom';
-import Orders from '../Components/Orders/OrdersList';
+import { Link } from 'react-router-dom';
+import OrderList from '../Components/Orders/OrdersList';
 import IsLoggedChecker from '../Components/IsLoggedChecker';
-import logout from '../Services/logout';
 import PageHeader from '../Components/PageHeader';
 import LogoutButton from '../Components/LogoutButton';
 import UserEmail from '../Components/UserEmail';
@@ -20,14 +19,6 @@ const Content = styled.main`
 `;
 
 function AdminPage() {
-    const navigate = useNavigate();
-
-    const handleCloseSession = () => {
-        logout().then(() => {
-            navigate('/login');
-        }).catch(error => console.log(error));
-    };
-
     return (
         <Layout style={{ minHeight: "100vh" }}>
             <IsLoggedChecker requiredAttributes="admin" />
@@ -58,7 +49,7 @@ function AdminPage() {
                 <StyledA
                     href={`${import.meta.env.VITE_API_URL}/orders/export`}
                 >Descargar planilla</StyledA>
-                <Orders />
+                <OrderList />
             </Content>
             <Footer>
 

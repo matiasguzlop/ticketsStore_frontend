@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { Button } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
 import deleteAllowedUser from '../../Services/deleteAllowedUser';
+import DeleteConfirmationModal from '../DeleteConfirmationModal';
 
 const Container = styled.article`
     margin-top: 1rem;
@@ -13,26 +14,29 @@ function SingleUser({ user }) {
     const [shouldRender, setShouldRender] = useState(true);
     const [showDeleteConfirmationModal, setShowDeleteConfirmationModal] = useState(false);
 
-    const handleDelete = (e) => {
+    const [deleteFetchStatus, setDeleteFetchStatus] = useState({ isError: false, isLoading: false });
+
+    const handleDelete = () => {
         setShowDeleteConfirmationModal(true);
     };
 
-    const handleDeleteConfirmed = async () => {
-        const result = await deleteAllowedUser(user._id);
-        setShowDeleteConfirmationModal(false);
-        if (result?.status === 200) {
-            setShouldRender(false);
-        }
+    const handleDeleteConfirmed = () => {
+        setDeleteFetchStatus({ isError: false, isLoading: true });
+        deleteAllowedUser(user._id)
+            .then(() => {
+                setDeleteFetchStatus({ isError: false, isLoading: false });
+                setShouldRender(false);
+                setShowDeleteConfirmationModal(false);
+            })
+            .catch(() => setDeleteFetchStatus({ isError: true, isLoading: false }));
     };
 
-    const handleDeleteCancelled = () => {
-        setShowDeleteConfirmationModal(false);
-    };
 
     if (shouldRender === false) return;
 
     const UserDescription = ({ withDelete }) =>
         <Card
+            bordered={false}
             title={user.email}
             extra={
                 withDelete &&
@@ -55,14 +59,15 @@ function SingleUser({ user }) {
     return (
         <Container>
             <UserDescription withDelete={true} />
-            <Modal
+            <DeleteConfirmationModal
                 title='¿Seguro que quieres eliminar el usuario?'
-                onCancel={handleDeleteCancelled}
-                open={showDeleteConfirmationModal}
-                onOk={handleDeleteConfirmed}
+                show={showDeleteConfirmationModal}
+                setShow={setShowDeleteConfirmationModal}
+                onConfirm={handleDeleteConfirmed}
+                status={deleteFetchStatus}
             >
-                <UserDescription />
-            </Modal>
+                <UserDescription withDelete={false} />
+            </DeleteConfirmationModal>
         </Container>
     );
 }

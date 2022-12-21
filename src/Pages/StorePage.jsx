@@ -3,10 +3,11 @@ import ProductCard from '../Components/Store/ProductCard';
 import getProducts from '../Services/getProducts';
 import addToCart from '../Services/addToCart';
 import ProductsContainer from '../Components/Store/ProductsContainer';
-import DinamicModal from '../Components/Store/DinamicModal';
-import { Descriptions } from 'antd';
 import { useContext } from 'react';
 import MyContext from '../MyContext';
+import FetchErrorMessage from '../Components/FetchErrorMessage';
+import FetchLoadingMessage from '../Components/FetchLoadingMessage';
+import AddedProductModal from '../Components/Store/AddedProductModal';
 
 
 export default function StorePage() {
@@ -14,33 +15,44 @@ export default function StorePage() {
 
     // states for fetching products
     const [products, setProducts] = useState(null);
-    const [isError, setIsError] = useState(false);
+    const [productsFetchState, setProductsFetchState] = useState({ isError: false, isLoading: true });
 
     // status for adding to cart request
     const [productToCart, setProductToCart] = useState(null);
-    const [addStatus, setAddStatus] = useState("loading");
-    const [showCartConfirmationModal, setShowCartConfirmationModal] = useState(false);
+    const [addStatus, setAddStatus] = useState({ isError: false, isLoading: false });
+
+    const [showAddedProductModal, setShowAddedProductModal] = useState(false);
 
     useEffect(() => {
         //get all products in store
-        getProducts().then(result => {
-            setProducts(result);
-            setIsError(false);
-        }).catch(error => isError(true));
+        setProductsFetchState({ isError: false, isLoading: true });
+        getProducts()
+            .then(result => {
+                setProductsFetchState({ isError: false, isLoading: false });
+                setProducts(result.data.message);
+            }).catch(() =>
+                setProductsFetchState({ isError: true, isLoading: false })
+            );
     }, []);
 
     useEffect(() => {
         //update cart through api when productToCart changes.
-        if (productToCart === null) {
-            setShowCartConfirmationModal(false);
-        } else {
-            addToCart(productToCart, setAddStatus).then(getCartImperative);
-            setShowCartConfirmationModal(true);
+        if (productToCart !== null) {
+            setAddStatus({ isError: false, isLoading: true });
+            setShowAddedProductModal(true);
+            addToCart(productToCart)
+                .then(() => {
+                    setAddStatus({ isError: false, isLoading: false });
+                    getCartImperative();
+                })
+                .catch(() => {
+                    setAddStatus({ isError: true, isLoading: false });
+                });
         }
     }, [productToCart]);
 
-    if (isError) return "Error!";
-    if (products === null) return "Loading...";
+    if (productsFetchState.isError) return <FetchErrorMessage resourceName="productos" />;
+    if (productsFetchState.isLoading) return <FetchLoadingMessage resourceName="productos" />;
     if (products.length === 0) {
         return (
             "Aún no hay productos en la tienda."
@@ -59,20 +71,12 @@ export default function StorePage() {
                     ></ProductCard>
                 )}
             </ProductsContainer>
-            <DinamicModal
-                type={addStatus}
-                show={showCartConfirmationModal}
-                setShow={setShowCartConfirmationModal}
-                successTitle="Producto agregado"
-            >
-                {productToCart &&
-                    <Descriptions title="" layout='horizonal'>
-                        <Descriptions.Item
-                            label=""
-                        >{`${productToCart.name} \t X ${productToCart.qty}`}</Descriptions.Item>
-                    </Descriptions>
-                }
-            </DinamicModal>
+            <AddedProductModal
+                fetchStatus={addStatus}
+                productToCart={productToCart}
+                show={showAddedProductModal}
+                setShow={setShowAddedProductModal}
+            />
         </>
     );
 }

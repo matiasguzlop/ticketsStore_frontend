@@ -5,19 +5,22 @@ import SingleProduct from './SingleProduct';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import NewProductModal from './NewProductModal';
+import FetchErrorMessage from '../../Components/FetchErrorMessage';
+import FetchLoadingMessage from '../../Components/FetchLoadingMessage';
 
 
 function ProductList() {
-    const [products, setProducts] = useState(null);
-    const [isError, setIsError] = useState(false);
+    const [products, setProducts] = useState([]);
+    const [productFetchStatus, setProductFetchStatus] = useState({ isError: false, isLoading: false });
 
     const [showNewProductModal, setShowNewProductModal] = useState(false);
 
     const getProductsImperative = () => {
+        setProductFetchStatus({ isError: false, isLoading: true });
         getProducts().then(result => {
-            setIsError(false);
-            setProducts(result);
-        }).catch(error => setIsError(true));
+            setProductFetchStatus({ isError: false, isLoading: false });
+            setProducts(result.data.message);
+        }).catch(error => setProductFetchStatus({ isError: true, isLoading: false }));
     };
 
     useEffect(getProductsImperative, []);
@@ -27,8 +30,8 @@ function ProductList() {
     };
 
 
-    if (isError) return "Error";
-    if (products === null) return "Cargando...";
+    if (productFetchStatus.isError) return <FetchErrorMessage resourceName='productos' />;
+    if (productFetchStatus.isLoading) return <FetchLoadingMessage resourceName='productos' />;
     return (
         <>
             <Button

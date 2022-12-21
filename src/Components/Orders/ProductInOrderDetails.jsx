@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import getProduct from '../../Services/getProduct';
+import FetchErrorMessage from '../FetchErrorMessage';
+import FetchLoadingMessage from '../FetchLoadingMessage';
+import FormattedPrice from '../FormattedPrice';
+
 
 const ProductName = styled.span`
     /* font-weight: bold; */
@@ -32,25 +36,29 @@ const Container = styled.li`
 
 function ProductInOrderDetails({ qty, id }) {
     const [productData, setProductData] = useState(null);
-    const [isError, setIsError] = useState(false);
+    const [fetchStatus, setFetchStatus] = useState({ isError: false, isLoading: false });
 
     useEffect(() => {
+        setFetchStatus({ isError: false, isLoading: true });
         getProduct(id).then(result => {
             setProductData(result);
-            setIsError(false);
-        }).catch(e => setIsError(true));
+            setFetchStatus({ isError: false, isLoading: false });
+        }).catch(() => setFetchStatus({ isError: true, isLoading: false }));
     }, []);
 
-    if (isError) return "Error al cargar producto";
-    if (productData === null) return "Cargando...";
-    const productTotal = (parseInt(qty) * parseInt(productData.price)).toLocaleString("es-CL", { currency: "CLP" });
-    return (
-        <Container>
-            <ProductName>{productData.name}</ProductName>
-            <ProductQty>{` x ${qty} un.`}</ProductQty>
-            <ProductTotal>{`$${productTotal}`}</ProductTotal>
-        </Container>
-    );
+    if (fetchStatus.isError) return <FetchErrorMessage resourceName='producto' />;
+    if (fetchStatus.isLoading) return <FetchLoadingMessage resourceName='producto' />;
+
+    if (productData) {
+        const productTotal = <FormattedPrice price={(parseInt(qty) * parseInt(productData.price))} />;
+        return (
+            <Container>
+                <ProductName>{productData.name}</ProductName>
+                <ProductQty>{` x ${qty} un.`}</ProductQty>
+                <ProductTotal>{productTotal}</ProductTotal>
+            </Container>
+        );
+    }
 }
 
 export default ProductInOrderDetails;
